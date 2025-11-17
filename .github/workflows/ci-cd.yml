@@ -1,0 +1,20 @@
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4   # 1) Clone your repo
+      - uses: actions/setup-node@v4 # 2) Install Node
+
+      # Backend
+      - run: npm ci
+        working-directory: backend  # 3) Install backend deps
+      - run: npm run build
+        working-directory: backend  # 4) Build backend
+
+      # Frontend
+      - run: npm ci
+        working-directory: frontend # 5) Install frontend deps
+      - run: npm run build
+        working-directory: frontend # 6) Build frontend
