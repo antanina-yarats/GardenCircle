@@ -1,0 +1,14 @@
+# Node
+node_modules
+dist
+build
+
+# Env
+backend/.env
+frontend/.env
+
+# OS
+.DS_Store
+
+# Vite/Rollup cache
+frontend/.vite
