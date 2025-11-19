@@ -1,20 +1,55 @@
-on: push
+name: CI/CD - GardenCircle
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4   # 1) Clone your repo
-      - uses: actions/setup-node@v4 # 2) Install Node
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      # Backend
-      - run: npm ci
-        working-directory: backend  # 3) Install backend deps
-      - run: npm run build
-        working-directory: backend  # 4) Build backend
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
-      # Frontend
-      - run: npm ci
-        working-directory: frontend # 5) Install frontend deps
-      - run: npm run build
-        working-directory: frontend # 6) Build frontend
+      # BACKEND
+      - name: Install backend dependencies
+        run: npm ci
+        working-directory: backend
+
+      - name: Build backend
+        run: npm run build
+        working-directory: backend
+
+      # FRONTEND
+      - name: Install frontend dependencies
+        run: npm ci
+        working-directory: frontend
+
+      - name: Build frontend
+        run: npm run build
+        working-directory: frontend
+
+  deploy-backend:
+    name: Deploy backend to Azure Web App
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: gardencircle-backend     
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: backend
